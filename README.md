@@ -1,2 +1,11 @@
-# study-planner-ai
-Adaptive Study Planner using scoring logic based on energy, time and priority.
+---
+title: Study Planner AI
+emoji: 📚
+colorFrom: blue
+colorTo: green
+sdk: python
+pinned: false
+---
+# Study Planner AI
+
+This API generates an adaptive study plan based on user input.
