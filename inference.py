@@ -1,34 +1,34 @@
-from flask import Flask, request, jsonify
-import random
+import json
 
-app = Flask(__name__)
+def handler(event, context):
+    try:
+        body = json.loads(event["body"])
 
-@app.route("/reset", methods=["POST"])
-def reset():
-    return jsonify({
-        "message": "Environment reset successful"
-    })
+        subject = body.get("subject", "")
+        hours = body.get("hours", 0)
+        days = body.get("days", 0)
+        missed_days = body.get("missed_days", 0)
 
-@app.route("/run", methods=["POST"])
-def run():
-    data = request.json
+        if not subject:
+            return {"statusCode": 400, "body": "Subject required"}
 
-    energy = data.get("energy", 50)
-    time = data.get("time", 60)
+        remaining_days = days - missed_days
+        if remaining_days <= 0:
+            return {"statusCode": 400, "body": "Invalid days"}
 
-    subjects = ["maths", "science", "english", "history"]
-    plan = []
+        hours_per_day = round(hours / remaining_days, 2)
 
-    for i in range(4):
-        subject = random.choice(subjects)
-        plan.append(subject)
+        plan = f"Study {subject} {hours_per_day} hrs daily for {remaining_days} days"
 
-    return jsonify({
-        "plan": plan,
-        "energy": energy,
-        "time": time,
-        "message": "Plan generated"
-    })
+        return {
+            "statusCode": 200,
+            "body": json.dumps({
+                "plan": plan
+            })
+        }
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=7860)
+    except Exception as e:
+        return {
+            "statusCode": 500,
+            "body": str(e)
+        }
